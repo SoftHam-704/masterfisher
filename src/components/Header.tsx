@@ -46,8 +46,15 @@ const Header = () => {
             }
         });
 
+        // Listen for profile updates
+        const handleProfileUpdate = () => {
+            fetchUserAndProfile();
+        };
+        window.addEventListener('profile-updated', handleProfileUpdate);
+
         return () => {
             subscription.unsubscribe();
+            window.removeEventListener('profile-updated', handleProfileUpdate);
         };
     }, []);
 
