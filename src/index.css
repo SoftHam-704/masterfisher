@@ -1,0 +1,243 @@
+/* Lovable Design System Variables */
+:root {
+  /* Ocean Palette */
+  --ocean-dark: 200 70% 15%;
+  --ocean-deep: 200 65% 20%;
+  --ocean-medium: 200 60% 30%;
+  
+  /* Turquoise */
+  --turquoise: 175 70% 45%;
+  --turquoise-glow: 175 75% 55%;
+  
+  /* Golden */
+  --golden: 38 95% 55%;
+  --golden-light: 38 100% 65%;
+  
+  /* Nature */
+  --nature-green: 140 60% 45%;
+}
+
+/* Text Gradients */
+.text-gradient-golden {
+  background: linear-gradient(135deg, hsl(38 95% 55%) 0%, hsl(38 100% 65%) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-ocean {
+  background: linear-gradient(135deg, hsl(175 70% 45%) 0%, hsl(200 55% 45%) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Background Gradients */
+.bg-ocean-gradient {
+  background: linear-gradient(135deg, hsl(200 70% 15%) 0%, hsl(200 65% 20%) 50%, hsl(200 60% 30%) 100%);
+}
+
+.bg-hero-overlay {
+  background: linear-gradient(135deg, rgba(10, 37, 64, 0.7) 0%, rgba(15, 53, 84, 0.5) 100%);
+}
+
+/* Glass Effects */
+.glass-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-card-dark {
+  background: rgba(10, 37, 64, 0.4);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Hover Effects */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+}
+
+/* Animation Delays */
+.animation-delay-200 {
+  animation-delay: 200ms;
+}
+
+.animation-delay-400 {
+  animation-delay: 400ms;
+}
+
+.animation-delay-600 {
+  animation-delay: 600ms;
+}
+
+.animation-delay-800 {
+  animation-delay: 800ms;
+}
+
+.animation-delay-500 {
+  animation-delay: 500ms;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 200 90% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 200 90% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 200 90% 12%;
+
+    --primary: 195 85% 35%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 174 72% 42%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 200 20% 50%;
+
+    --accent: 24 95% 53%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 195 30% 88%;
+    --input: 195 30% 88%;
+    --ring: 195 85% 35%;
+
+    --radius: 0.75rem;
+
+    /* Custom design tokens */
+    --ocean-blue: 195 85% 35%;
+    --ocean-blue-light: 195 75% 55%;
+    --ocean-blue-dark: 195 90% 25%;
+    --aqua: 174 72% 42%;
+    --aqua-light: 174 65% 60%;
+    --sand: 38 60% 85%;
+    --sunset: 24 95% 53%;
+    
+    /* Gradients */
+    --gradient-ocean: linear-gradient(135deg, hsl(195 85% 35%), hsl(174 72% 42%));
+    --gradient-sunset: linear-gradient(135deg, hsl(24 95% 53%), hsl(38 90% 60%));
+    --gradient-hero: linear-gradient(180deg, hsl(195 85% 25% / 0.8), hsl(195 85% 35% / 0.95));
+
+    /* Shadows */
+    --shadow-ocean: 0 10px 40px -10px hsl(195 85% 35% / 0.3);
+    --shadow-soft: 0 4px 20px -2px hsl(200 20% 50% / 0.1);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 200 90% 12%;
+    --sidebar-primary: 195 85% 35%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 40% 96%;
+    --sidebar-accent-foreground: 200 90% 12%;
+    --sidebar-border: 195 30% 88%;
+    --sidebar-ring: 195 85% 35%;
+
+    /* Marquee Animation */
+    --marquee-duration: 30s;
+    --marquee-gap: 2rem;
+  }
+
+  .dark {
+    --background: 200 90% 8%;
+    --foreground: 210 40% 98%;
+
+    --card: 200 80% 10%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 200 80% 10%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 195 85% 45%;
+    --primary-foreground: 200 90% 8%;
+
+    --secondary: 174 65% 45%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 200 50% 15%;
+    --muted-foreground: 200 20% 70%;
+
+    --accent: 24 95% 53%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 200 40% 20%;
+    --input: 200 40% 20%;
+    --ring: 195 85% 45%;
+
+    --ocean-blue: 195 85% 45%;
+    --ocean-blue-light: 195 75% 60%;
+    --ocean-blue-dark: 195 90% 30%;
+    --aqua: 174 65% 45%;
+    --aqua-light: 174 60% 55%;
+    --sand: 38 50% 75%;
+    --sunset: 24 95% 58%;
+
+    --gradient-ocean: linear-gradient(135deg, hsl(195 85% 35%), hsl(174 72% 42%));
+    --gradient-sunset: linear-gradient(135deg, hsl(24 95% 53%), hsl(38 90% 60%));
+    --gradient-hero: linear-gradient(180deg, hsl(195 85% 20% / 0.9), hsl(195 85% 30% / 0.95));
+
+    --shadow-ocean: 0 10px 40px -10px hsl(195 85% 45% / 0.4);
+    --shadow-soft: 0 4px 20px -2px hsl(200 60% 20% / 0.3);
+
+    --sidebar-background: 200 80% 10%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 195 85% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 200 50% 15%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 200 40% 20%;
+    --sidebar-ring: 195 85% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-100% - var(--marquee-gap)));
+  }
+}
+
+.animate-marquee {
+  animation: marquee var(--marquee-duration) linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}

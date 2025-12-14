@@ -1,0 +1,7 @@
+project_id = "tbiutzyaxkqhqkxdciuf"
+
+[functions.send-partner-email]
+verify_jwt = true
+
+[functions.stripe-partner-webhook]
+verify_jwt = false

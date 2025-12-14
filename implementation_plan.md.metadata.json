@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Fix build path in index.html and downgrade React to v18 for stability.",
+  "updatedAt": "2025-11-22T11:31:49.854796800Z"
+}

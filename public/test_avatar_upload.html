@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avatar Upload Test</title>
+    <script src="https://tbiutzyaxkqhqkxdciuf.supabase.co/auth/v1/verify"></script>
+</head>
+<body>
+    <h1>Testando Upload de Avatar...</h1>
+    <p>Aguarde enquanto o avatar é carregado...</p>
+    <div id="status"></div>
+    
+    <script type="module">
+        // Import Supabase client
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+        
+        const supabaseUrl = 'https://tbiutzyaxkqhqkxdciuf.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4ZmJ0enhja2FzamFwcHZkaWtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0NjE0NzAsImV4cCI6MjA3OTAzNzQ3MH0.TIgWhKm6S5OSIcxFMWYCX64nYjNPx3fz3LDZD5RKmS8';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+        
+        const statusDiv = document.getElementById('status');
+        
+        async function uploadAvatar() {
+            try {
+                statusDiv.innerHTML = '<p>🔍 Verificando usuário logado...</p>';
+                
+                // Get the current user
+                const { data: { user }, error: userError } = await supabase.auth.getUser();
+                if (userError || !user) {
+                    statusDiv.innerHTML = '<p style="color: red;">❌ Erro: Nenhum usuário logado. Por favor, faça login primeiro.</p>';
+                    statusDiv.innerHTML += '<p><a href="http://localhost:8080/auth">Ir para página de login</a></p>';
+                    return;
+                }
+                
+                statusDiv.innerHTML = `<p>✅ Usuário logado: ${user.email}</p>`;
+                statusDiv.innerHTML += '<p>📥 Carregando imagem...</p>';
+                
+                // Fetch the user avatar image
+                const response = await fetch('/user_avatar.png');
+                if (!response.ok) {
+                    throw new Error('Falha ao carregar imagem');
+                }
+                
+                const blob = await response.blob();
+                statusDiv.innerHTML += `<p>✅ Imagem carregada: ${(blob.size / 1024).toFixed(2)} KB</p>`;
+                statusDiv.innerHTML += '<p>🔄 Convertendo para base64...</p>';
+                
+                // Convert to base64
+                const reader = new FileReader();
+                reader.readAsDataURL(blob);
+                
+                reader.onload = async () => {
+                    const base64String = reader.result;
+                    statusDiv.innerHTML += `<p>✅ Conversão completa: ${(base64String.length / 1024).toFixed(2)} KB</p>`;
+                    statusDiv.innerHTML += '<p>📤 Enviando para Supabase...</p>';
+                    
+                    // Update profile with avatar
+                    const { data, error } = await supabase
+                        .from('profiles')
+                        .update({ avatar_url: base64String })
+                        .eq('id', user.id)
+                        .select();
+                    
+                    if (error) {
+                        statusDiv.innerHTML += `<p style="color: red;">❌ Erro ao atualizar avatar: ${error.message}</p>`;
+                        console.error('Error updating avatar:', error);
+                    } else {
+                        statusDiv.innerHTML += '<p style="color: green; font-weight: bold;">✅ Avatar atualizado com sucesso!</p>';
+                        statusDiv.innerHTML += '<p>🔄 Redirecionando para o perfil em 2 segundos...</p>';
+                        console.log('Avatar updated successfully!', data);
+                        
+                        // Redirect to profile page
+                        setTimeout(() => {
+                            window.location.href = 'http://localhost:8080/perfil';
+                        }, 2000);
+                    }
+                };
+                
+                reader.onerror = (error) => {
+                    statusDiv.innerHTML += `<p style="color: red;">❌ Erro ao ler arquivo: ${error}</p>`;
+                    console.error('Error reading file:', error);
+                };
+            } catch (error) {
+                statusDiv.innerHTML += `<p style="color: red;">❌ Erro: ${error.message}</p>`;
+                console.error('Error in uploadAvatar:', error);
+            }
+        }
+        
+        // Run the function when page loads
+        uploadAvatar();
+    </script>
+</body>
+</html>
