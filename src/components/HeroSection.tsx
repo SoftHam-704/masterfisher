@@ -5,10 +5,12 @@ import heroImage from "@/assets/hero-fishing.jpg";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useFloatingCTA } from "@/contexts/FloatingCTAContext";
 
 const HeroSection = () => {
     const { t } = useLanguage();
     const navigate = useNavigate();
+    const { openModal } = useFloatingCTA();
     const [stats, setStats] = useState({
         guides: 0,
         businesses: 0,
@@ -66,7 +68,7 @@ const HeroSection = () => {
             icon: Users,
             label: t("common.tourists"),
             value: stats.tourists > 0 ? `${stats.tourists}+` : "0",
-            onClick: () => window.scrollTo({ top: 400, behavior: 'smooth' })
+            onClick: openModal
         },
     ];
 
