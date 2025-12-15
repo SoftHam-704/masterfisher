@@ -5,15 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import { TermsOfUseAcceptance } from "@/components/TermsOfUseAcceptance";
-import { Check, Loader2, Store, Sparkles, TrendingUp, Users, MapPin, Award } from "lucide-react";
+import { Check, Loader2, Sparkles, TrendingUp, Users, MapPin, Award } from "lucide-react";
 import supplierService from "@/assets/supplier-service.jpg";
 import { useLanguage } from "@/contexts/LanguageContext";
 
-type PlanType = 'monthly' | 'annual';
+type PlanType = 'annual';
 
 export default function BusinessRegister() {
     const navigate = useNavigate();
@@ -54,11 +53,12 @@ export default function BusinessRegister() {
         setIsLoading(true);
 
         try {
-            const amount = selectedPlan === 'monthly' ? 99.90 : 958.80;
+            // Always annual plan now
+            const amount = 958.80;
             const { data, error } = await supabase.functions.invoke('create-mercadopago-checkout', {
                 body: {
                     ...formData,
-                    planType: selectedPlan === 'monthly' ? 'monthly' : 'yearly',
+                    planType: 'yearly',
                     amount,
                     origin: window.location.origin
                 }
@@ -88,24 +88,10 @@ export default function BusinessRegister() {
 
     const plans = [
         {
-            id: 'monthly' as PlanType,
-            name: t('businessRegister.monthlyPlan'),
-            price: 99.90,
-            icon: Store,
-            features: [
-                t('businessRegister.fullCompanyProfile'),
-                t('businessRegister.productGallery'),
-                t('businessRegister.reviewSystem'),
-                t('businessRegister.featuredVisibility'),
-                t('businessRegister.visitStats'),
-                t('businessRegister.prioritySupport')
-            ]
-        },
-        {
             id: 'annual' as PlanType,
             name: t('businessRegister.annualPlan'),
             price: 958.80,
-            priceLabel: 'R$ 958,80/ano',
+            priceLabel: 'R$ 958,80 (12x R$ 79,90)',
             discount: t('businessRegister.discount'),
             icon: Sparkles,
             popular: true,
@@ -217,13 +203,13 @@ export default function BusinessRegister() {
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-8 mb-12">
+                    <div className="max-w-md mx-auto mb-12">
                         {plans.map((plan) => {
                             const Icon = plan.icon;
                             return (
                                 <Card
                                     key={plan.id}
-                                    className={`relative ${selectedPlan === plan.id ? 'border-2 border-primary shadow-lg' : ''} ${plan.popular ? 'scale-105 shadow-xl' : ''}`}
+                                    className={`relative border-2 border-primary shadow-lg scale-105`}
                                 >
                                     {plan.popular && (
                                         <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-semibold">
@@ -231,13 +217,13 @@ export default function BusinessRegister() {
                                         </div>
                                     )}
                                     <CardHeader className="text-center">
-                                        <Icon className={`h-12 w-12 mx-auto mb-4 ${plan.id === 'annual' ? 'text-yellow-500' : 'text-primary'}`} />
+                                        <Icon className={`h-12 w-12 mx-auto mb-4 text-yellow-500`} />
                                         <CardTitle className="text-2xl">{plan.name}</CardTitle>
                                         {plan.discount && (
                                             <div className="text-sm text-primary font-semibold">{plan.discount}</div>
                                         )}
                                         <div className="text-4xl font-bold mt-4 text-primary">
-                                            {plan.priceLabel || `R$ ${plan.price.toFixed(2)}/mês`}
+                                            {plan.priceLabel}
                                         </div>
                                     </CardHeader>
                                     <CardContent>
@@ -250,11 +236,11 @@ export default function BusinessRegister() {
                                             ))}
                                         </ul>
                                         <Button
-                                            variant={selectedPlan === plan.id ? "default" : "outline"}
+                                            variant="default"
                                             className="w-full"
-                                            onClick={() => setSelectedPlan(plan.id)}
+                                            disabled={true}
                                         >
-                                            {selectedPlan === plan.id ? t('businessRegister.planSelected') : t('businessRegister.selectPlan')}
+                                            {t('businessRegister.planSelected')}
                                         </Button>
                                     </CardContent>
                                 </Card>
@@ -267,7 +253,7 @@ export default function BusinessRegister() {
                         <CardHeader>
                             <CardTitle>{t('businessRegister.registrationData')}</CardTitle>
                             <CardDescription>
-                                {t('businessRegister.completeDataSubscribe')} {plans.find(p => p.id === selectedPlan)?.name}
+                                {t('businessRegister.completeDataSubscribe')} {plans[0].name}
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -277,13 +263,13 @@ export default function BusinessRegister() {
                                         <div>
                                             <p className="font-semibold">{t('businessRegister.planSelected')}:</p>
                                             <p className="text-2xl font-bold text-primary">
-                                                {plans.find(p => p.id === selectedPlan)?.name}
+                                                {plans[0].name}
                                             </p>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-sm text-muted-foreground">{t('businessRegister.monthlyValue')}</p>
+                                            <p className="text-sm text-muted-foreground">Valor Anual</p>
                                             <p className="text-3xl font-bold text-primary">
-                                                R$ {plans.find(p => p.id === selectedPlan)?.price.toFixed(2)}
+                                                R$ {plans[0].price.toFixed(2)}
                                             </p>
                                         </div>
                                     </div>
@@ -427,7 +413,7 @@ export default function BusinessRegister() {
                                             {t('common.processing')}
                                         </>
                                     ) : (
-                                        `${t('businessRegister.subscribe')} ${plans.find(p => p.id === selectedPlan)?.name} - R$ ${plans.find(p => p.id === selectedPlan)?.price.toFixed(2)}/mês`
+                                        `Assinar Plano Anual - R$ 958,80/Ano`
                                     )}
                                 </Button>
                             </form>
