@@ -91,7 +91,8 @@ export default function BusinessRegister() {
             id: 'annual' as PlanType,
             name: t('businessRegister.annualPlan'),
             price: 958.80,
-            priceLabel: 'R$ 958,80 (12x R$ 79,90)',
+            priceLabel: 'R$ 958,80',
+            installmentLabel: '(12x R$ 79,90)',
             discount: t('businessRegister.discount'),
             icon: Sparkles,
             popular: true,
@@ -206,6 +207,9 @@ export default function BusinessRegister() {
                     <div className="max-w-md mx-auto mb-12">
                         {plans.map((plan) => {
                             const Icon = plan.icon;
+                            // Safe cast or check for property existence if needed, but since we defined it above it works.
+                            // However, TS might complain if the type inferred doesn't match usage.
+                            // Let's modify the usage to check for property.
                             return (
                                 <Card
                                     key={plan.id}
@@ -222,8 +226,15 @@ export default function BusinessRegister() {
                                         {plan.discount && (
                                             <div className="text-sm text-primary font-semibold">{plan.discount}</div>
                                         )}
-                                        <div className="text-4xl font-bold mt-4 text-primary">
-                                            {plan.priceLabel}
+                                        <div className="mt-4 text-primary">
+                                            <div className="text-4xl font-bold">
+                                                {plan.priceLabel}
+                                            </div>
+                                            {'installmentLabel' in plan && (
+                                                <div className="text-lg font-medium mt-1">
+                                                    {(plan as any).installmentLabel}
+                                                </div>
+                                            )}
                                         </div>
                                     </CardHeader>
                                     <CardContent>
