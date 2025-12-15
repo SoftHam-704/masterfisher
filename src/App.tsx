@@ -38,6 +38,8 @@ import GuidePaymentCanceled from "./pages/GuidePaymentCanceled";
 import GuiasLanding from "./pages/GuiasLanding";
 import TermsOfUse from "./pages/TermsOfUse";
 import Privacy from "./pages/Privacy";
+import SponsorsLanding from "./pages/SponsorsLanding";
+import MasterSponsorLanding from "./pages/MasterSponsorLanding";
 
 const queryClient = new QueryClient();
 
@@ -86,6 +88,8 @@ const App = () => (
                             <Route path="/pagamento-pendente" element={<GuidePaymentSuccess />} />
                             <Route path="/ranking" element={<Ranking />} />
                             <Route path="/admin-callback" element={<AdminCallback />} />
+                            <Route path="/patrocinadores" element={<SponsorsLanding />} />
+                            <Route path="/patrocinadormaster" element={<MasterSponsorLanding />} />
 
                             <Route path="*" element={<NotFound />} />
                         </Routes>

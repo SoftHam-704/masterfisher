@@ -75,7 +75,7 @@ export default function PartnerCheckout() {
 
             // Para plano Gold, segue fluxo normal com pagamento
             const amount = 559; // Parceiro Gold: R$ 559
-            
+
             const { data, error } = await supabase.functions.invoke('create-mercadopago-checkout', {
                 body: {
                     ...formData,
@@ -85,7 +85,7 @@ export default function PartnerCheckout() {
                     origin: window.location.origin
                 }
             });
-            
+
             if (error) throw error;
             if (data?.url) {
                 window.open(data.url, '_blank');
@@ -107,7 +107,7 @@ export default function PartnerCheckout() {
             setIsLoading(false);
         }
     };
-    
+
     const plans = [
         {
             id: 'gold',
@@ -459,6 +459,16 @@ export default function PartnerCheckout() {
                                                 {planType === plan.id ? t('partnerCheckout.planSelected') : t('partnerCheckout.selectPlan')}
                                             </Button>
                                         )}
+                                        <div className="mt-4 text-center">
+                                            <a
+                                                href={isMasterPlan ? "/patrocinadormaster" : "/patrocinadores"}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-sm text-primary hover:underline"
+                                            >
+                                                {isMasterPlan ? "Por que ser Parceiro Master?" : "Por que ser Parceiro Gold?"}
+                                            </a>
+                                        </div>
                                     </CardContent>
                                 </Card>
                             );
