@@ -71,7 +71,7 @@ const Header = () => {
         const { data } = await supabase
             .from('profiles')
             .select('display_name, avatar_url')
-            .eq('user_id', userId)
+            .eq('id', userId)
             .single();
 
         if (data) {

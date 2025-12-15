@@ -619,8 +619,8 @@ const GuiasLanding = () => {
 
                 <div className="cta-row">
                   <a
-                      className="btn-primary"
-                      href="/cadastrar-guia"
+                    className="btn-primary"
+                    href="/cadastrar-guia"
                   >
                     <span className="icon">{region.icon}</span>
                     <span>{region.ctaText}</span>
@@ -636,10 +636,9 @@ const GuiasLanding = () => {
                     {selectedRegion === "amazonas" ? "Aceita cartões internacionais." : "Pague com cartão em poucos segundos."}
                   </span>
                 </div>
-              </section>
 
-              <aside className="sidebar">
-                <section className="card-secondary">
+                {/* Content moved from card-secondary */}
+                <div style={{ marginTop: "40px", paddingTop: "30px", borderTop: "1px solid rgba(148, 163, 184, 0.2)" }}>
                   <div className="card-title">Para quem é</div>
                   <h2 className="card-heading">
                     {selectedRegion === "amazonas"
@@ -695,8 +694,10 @@ const GuiasLanding = () => {
                       <span>Quero ser guia MasterFisher</span>
                     </a>
                   </div>
-                </section>
+                </div>
+              </section>
 
+              <aside className="sidebar">
                 <section className="faq">
                   <div className="faq-title">Perguntas rápidas</div>
 

@@ -100,13 +100,7 @@ const Register = () => {
             return;
         }
 
-        // Update profile with user_type
-        if (data.user) {
-            await supabase
-                .from('profiles')
-                .update({ user_type: userType })
-                .eq('user_id', data.user.id);
-        }
+
 
         toast({
             title: "Conta criada com sucesso! 📧",
@@ -220,7 +214,7 @@ const Register = () => {
                                             <SelectValue placeholder="Selecione o tipo de conta" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="tourist">🎣 Pescador/Turista</SelectItem>
+                                            <SelectItem value="user">🎣 Pescador/Turista</SelectItem>
                                             <SelectItem value="guide">🧭 Guia de Pesca</SelectItem>
                                             <SelectItem value="supplier">🏪 Fornecedor/Empresa</SelectItem>
                                         </SelectContent>

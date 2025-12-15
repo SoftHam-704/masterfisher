@@ -66,7 +66,7 @@ const SupplierRegister = () => {
   const onSubmit = async (data: SupplierFormData) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (!user) {
         toast({
           title: "Erro",
@@ -120,13 +120,13 @@ const SupplierRegister = () => {
         youtube_url: data.youtube_url || null,
         website_url: data.website_url || null,
       };
-      
+
       const { error } = await (supabase as any).from('suppliers').insert(supplierData);
       // Update user profile to mark as supplier
       await supabase
         .from('profiles')
         .update({ user_type: 'supplier' })
-        .eq('user_id', user.id);
+        .eq('id', user.id);
 
       if (error) throw error;
 
@@ -148,7 +148,7 @@ const SupplierRegister = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
       <Header />
-      
+
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           <Button
@@ -159,7 +159,7 @@ const SupplierRegister = () => {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Voltar ao início
           </Button>
-          
+
           <Card className="p-8">
             <div className="mb-8">
               <div className="flex items-center gap-3 mb-4">
@@ -173,242 +173,242 @@ const SupplierRegister = () => {
               </p>
             </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <Label htmlFor="company_name">Nome da Empresa *</Label>
-                <Input
-                  id="company_name"
-                  {...register("company_name")}
-                  className="mt-2"
-                />
-                {errors.company_name && (
-                  <p className="text-sm text-destructive mt-1">{errors.company_name.message}</p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="cnpj">CNPJ *</Label>
-                <Input
-                  id="cnpj"
-                  {...register("cnpj")}
-                  placeholder="00.000.000/0000-00"
-                  className="mt-2"
-                />
-                {errors.cnpj && (
-                  <p className="text-sm text-destructive mt-1">{errors.cnpj.message}</p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="responsible_name">Nome do Responsável *</Label>
-                <Input
-                  id="responsible_name"
-                  {...register("responsible_name")}
-                  className="mt-2"
-                />
-                {errors.responsible_name && (
-                  <p className="text-sm text-destructive mt-1">{errors.responsible_name.message}</p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="responsible_cpf">CPF do Responsável *</Label>
-                <Input
-                  id="responsible_cpf"
-                  {...register("responsible_cpf")}
-                  placeholder="000.000.000-00"
-                  className="mt-2"
-                />
-                {errors.responsible_cpf && (
-                  <p className="text-sm text-destructive mt-1">{errors.responsible_cpf.message}</p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="phone">Telefone *</Label>
-                <Input
-                  id="phone"
-                  {...register("phone")}
-                  placeholder="(00) 00000-0000"
-                  className="mt-2"
-                />
-                {errors.phone && (
-                  <p className="text-sm text-destructive mt-1">{errors.phone.message}</p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="email">Email *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  {...register("email")}
-                  className="mt-2"
-                />
-                {errors.email && (
-                  <p className="text-sm text-destructive mt-1">{errors.email.message}</p>
-                )}
-              </div>
-
-              <div className="md:col-span-2">
-                <Label htmlFor="address">Endereço Completo *</Label>
-                <Input
-                  id="address"
-                  {...register("address")}
-                  className="mt-2"
-                />
-                {errors.address && (
-                  <p className="text-sm text-destructive mt-1">{errors.address.message}</p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="category">Categoria *</Label>
-                <Input
-                  id="category"
-                  {...register("category")}
-                  placeholder="Ex: Hotel, Restaurante, Loja"
-                  className="mt-2"
-                />
-                {errors.category && (
-                  <p className="text-sm text-destructive mt-1">{errors.category.message}</p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="operating_hours">Horário de Funcionamento *</Label>
-                <Input
-                  id="operating_hours"
-                  {...register("operating_hours")}
-                  placeholder="Ex: Seg-Sex 8h-18h"
-                  className="mt-2"
-                />
-                {errors.operating_hours && (
-                  <p className="text-sm text-destructive mt-1">{errors.operating_hours.message}</p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="payment_methods">Formas de Pagamento *</Label>
-                <Input
-                  id="payment_methods"
-                  {...register("payment_methods")}
-                  placeholder="Dinheiro, Cartão, PIX"
-                  className="mt-2"
-                />
-                {errors.payment_methods && (
-                  <p className="text-sm text-destructive mt-1">{errors.payment_methods.message}</p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="delivery_options">Opções de Entrega</Label>
-                <Input
-                  id="delivery_options"
-                  {...register("delivery_options")}
-                  placeholder="Entrega local, Correios"
-                  className="mt-2"
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="description">Descrição da Empresa *</Label>
-              <Textarea
-                id="description"
-                {...register("description")}
-                rows={3}
-                placeholder="Conte sobre sua empresa"
-                className="mt-2"
-              />
-              {errors.description && (
-                <p className="text-sm text-destructive mt-1">{errors.description.message}</p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="products_services">Produtos e Serviços *</Label>
-              <Textarea
-                id="products_services"
-                {...register("products_services")}
-                rows={4}
-                placeholder="Descreva os produtos e serviços oferecidos"
-                className="mt-2"
-              />
-              {errors.products_services && (
-                <p className="text-sm text-destructive mt-1">{errors.products_services.message}</p>
-              )}
-            </div>
-
-            <div>
-              <LogoUpload
-                onUploadComplete={(url) => setLogoUrl(url)}
-                currentLogoUrl={logoUrl}
-              />
-            </div>
-
-            {/* Redes Sociais */}
-            <div className="border-t pt-6">
-              <h3 className="text-lg font-semibold mb-4">Redes Sociais (opcional)</h3>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="instagram_url">Instagram</Label>
+                  <Label htmlFor="company_name">Nome da Empresa *</Label>
                   <Input
-                    id="instagram_url"
-                    type="url"
-                    {...register("instagram_url")}
-                    placeholder="https://instagram.com/suaempresa"
+                    id="company_name"
+                    {...register("company_name")}
                     className="mt-2"
                   />
+                  {errors.company_name && (
+                    <p className="text-sm text-destructive mt-1">{errors.company_name.message}</p>
+                  )}
                 </div>
 
                 <div>
-                  <Label htmlFor="facebook_url">Facebook</Label>
+                  <Label htmlFor="cnpj">CNPJ *</Label>
                   <Input
-                    id="facebook_url"
-                    type="url"
-                    {...register("facebook_url")}
-                    placeholder="https://facebook.com/suaempresa"
+                    id="cnpj"
+                    {...register("cnpj")}
+                    placeholder="00.000.000/0000-00"
                     className="mt-2"
                   />
+                  {errors.cnpj && (
+                    <p className="text-sm text-destructive mt-1">{errors.cnpj.message}</p>
+                  )}
                 </div>
 
                 <div>
-                  <Label htmlFor="youtube_url">YouTube</Label>
+                  <Label htmlFor="responsible_name">Nome do Responsável *</Label>
                   <Input
-                    id="youtube_url"
-                    type="url"
-                    {...register("youtube_url")}
-                    placeholder="https://youtube.com/@seucanal"
+                    id="responsible_name"
+                    {...register("responsible_name")}
                     className="mt-2"
                   />
+                  {errors.responsible_name && (
+                    <p className="text-sm text-destructive mt-1">{errors.responsible_name.message}</p>
+                  )}
                 </div>
 
                 <div>
-                  <Label htmlFor="website_url">Website</Label>
+                  <Label htmlFor="responsible_cpf">CPF do Responsável *</Label>
                   <Input
-                    id="website_url"
-                    type="url"
-                    {...register("website_url")}
-                    placeholder="https://seusite.com.br"
+                    id="responsible_cpf"
+                    {...register("responsible_cpf")}
+                    placeholder="000.000.000-00"
+                    className="mt-2"
+                  />
+                  {errors.responsible_cpf && (
+                    <p className="text-sm text-destructive mt-1">{errors.responsible_cpf.message}</p>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="phone">Telefone *</Label>
+                  <Input
+                    id="phone"
+                    {...register("phone")}
+                    placeholder="(00) 00000-0000"
+                    className="mt-2"
+                  />
+                  {errors.phone && (
+                    <p className="text-sm text-destructive mt-1">{errors.phone.message}</p>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="email">Email *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    {...register("email")}
+                    className="mt-2"
+                  />
+                  {errors.email && (
+                    <p className="text-sm text-destructive mt-1">{errors.email.message}</p>
+                  )}
+                </div>
+
+                <div className="md:col-span-2">
+                  <Label htmlFor="address">Endereço Completo *</Label>
+                  <Input
+                    id="address"
+                    {...register("address")}
+                    className="mt-2"
+                  />
+                  {errors.address && (
+                    <p className="text-sm text-destructive mt-1">{errors.address.message}</p>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="category">Categoria *</Label>
+                  <Input
+                    id="category"
+                    {...register("category")}
+                    placeholder="Ex: Hotel, Restaurante, Loja"
+                    className="mt-2"
+                  />
+                  {errors.category && (
+                    <p className="text-sm text-destructive mt-1">{errors.category.message}</p>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="operating_hours">Horário de Funcionamento *</Label>
+                  <Input
+                    id="operating_hours"
+                    {...register("operating_hours")}
+                    placeholder="Ex: Seg-Sex 8h-18h"
+                    className="mt-2"
+                  />
+                  {errors.operating_hours && (
+                    <p className="text-sm text-destructive mt-1">{errors.operating_hours.message}</p>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="payment_methods">Formas de Pagamento *</Label>
+                  <Input
+                    id="payment_methods"
+                    {...register("payment_methods")}
+                    placeholder="Dinheiro, Cartão, PIX"
+                    className="mt-2"
+                  />
+                  {errors.payment_methods && (
+                    <p className="text-sm text-destructive mt-1">{errors.payment_methods.message}</p>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="delivery_options">Opções de Entrega</Label>
+                  <Input
+                    id="delivery_options"
+                    {...register("delivery_options")}
+                    placeholder="Entrega local, Correios"
                     className="mt-2"
                   />
                 </div>
               </div>
-            </div>
 
-            <Button
-              type="submit"
-              variant="ocean"
-              size="lg"
-              className="w-full"
-              disabled={isSubmitting || uploading}
-            >
-              {isSubmitting || uploading ? t('common.registering') : t('common.registerCompany')}
-            </Button>
-          </form>
-        </Card>
+              <div>
+                <Label htmlFor="description">Descrição da Empresa *</Label>
+                <Textarea
+                  id="description"
+                  {...register("description")}
+                  rows={3}
+                  placeholder="Conte sobre sua empresa"
+                  className="mt-2"
+                />
+                {errors.description && (
+                  <p className="text-sm text-destructive mt-1">{errors.description.message}</p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="products_services">Produtos e Serviços *</Label>
+                <Textarea
+                  id="products_services"
+                  {...register("products_services")}
+                  rows={4}
+                  placeholder="Descreva os produtos e serviços oferecidos"
+                  className="mt-2"
+                />
+                {errors.products_services && (
+                  <p className="text-sm text-destructive mt-1">{errors.products_services.message}</p>
+                )}
+              </div>
+
+              <div>
+                <LogoUpload
+                  onUploadComplete={(url) => setLogoUrl(url)}
+                  currentLogoUrl={logoUrl}
+                />
+              </div>
+
+              {/* Redes Sociais */}
+              <div className="border-t pt-6">
+                <h3 className="text-lg font-semibold mb-4">Redes Sociais (opcional)</h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <Label htmlFor="instagram_url">Instagram</Label>
+                    <Input
+                      id="instagram_url"
+                      type="url"
+                      {...register("instagram_url")}
+                      placeholder="https://instagram.com/suaempresa"
+                      className="mt-2"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="facebook_url">Facebook</Label>
+                    <Input
+                      id="facebook_url"
+                      type="url"
+                      {...register("facebook_url")}
+                      placeholder="https://facebook.com/suaempresa"
+                      className="mt-2"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="youtube_url">YouTube</Label>
+                    <Input
+                      id="youtube_url"
+                      type="url"
+                      {...register("youtube_url")}
+                      placeholder="https://youtube.com/@seucanal"
+                      className="mt-2"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="website_url">Website</Label>
+                    <Input
+                      id="website_url"
+                      type="url"
+                      {...register("website_url")}
+                      placeholder="https://seusite.com.br"
+                      className="mt-2"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                variant="ocean"
+                size="lg"
+                className="w-full"
+                disabled={isSubmitting || uploading}
+              >
+                {isSubmitting || uploading ? t('common.registering') : t('common.registerCompany')}
+              </Button>
+            </form>
+          </Card>
         </div>
       </div>
     </div>

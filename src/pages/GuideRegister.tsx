@@ -51,7 +51,7 @@ export default function GuideRegister() {
         setIsLoading(true);
 
         try {
-         const { data, error } = await supabase.functions.invoke('create-mercadopago-checkout', {
+            const { data, error } = await supabase.functions.invoke('create-mercadopago-checkout', {
                 body: {
                     ...formData,
                     planType: 'guide',
@@ -86,7 +86,7 @@ export default function GuideRegister() {
                 await supabase
                     .from('profiles')
                     .update({ user_type: 'guide' })
-                    .eq('user_id', user.id);
+                    .eq('id', user.id);
             }
         } finally {
             setIsLoading(false);
