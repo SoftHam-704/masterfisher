@@ -214,7 +214,7 @@ const Register = () => {
                                             <SelectValue placeholder="Selecione o tipo de conta" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="user">🎣 Pescador/Turista</SelectItem>
+                                            <SelectItem value="tourist">🎣 Pescador/Turista</SelectItem>
                                             <SelectItem value="guide">🧭 Guia de Pesca</SelectItem>
                                             <SelectItem value="supplier">🏪 Fornecedor/Empresa</SelectItem>
                                         </SelectContent>

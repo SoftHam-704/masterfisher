@@ -9,6 +9,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import NotificationsPanel from "@/components/NotificationsPanel";
 import MessagesPanel from "@/components/MessagesPanel";
+import { useFloatingCTA } from "@/contexts/FloatingCTAContext";
 import { AdminAuthModal } from "@/components/admin/AdminAuthModal";
 import {
     DropdownMenu,
@@ -26,6 +27,7 @@ const Header = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { language, setLanguage, t } = useLanguage();
+    const { openModal } = useFloatingCTA();
     const [currentUser, setCurrentUser] = useState<any>(null);
     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -220,7 +222,7 @@ const Header = () => {
                         </Button>
                     ) : (
                         <Button
-                            onClick={() => navigate("/auth")}
+                            onClick={openModal}
                             className="bg-transparent border-0 text-primary-foreground hover:text-primary-foreground/80 font-body"
                             variant="ghost"
                         >

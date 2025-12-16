@@ -22,11 +22,11 @@ import UserGallery from "@/components/UserGallery";
 
 interface Profile {
     id: string;
-    user_id: string;
     display_name: string | null;
     phone: string | null;
     bio: string | null;
     avatar_url: string | null;
+    user_type: string | null;
 }
 
 const Profile = () => {
@@ -85,7 +85,23 @@ const Profile = () => {
                 .eq("id", currentUserId)
                 .single();
 
+
             if (isMounted && !error && profileData) {
+                // Auto-correct user_type 'user' to 'tourist'
+                if (profileData.user_type === 'user') {
+                    console.log("Auto-correcting outdated user_type 'user' to 'tourist'");
+                    const { error: updateError } = await supabase
+                        .from('profiles')
+                        .update({ user_type: 'tourist' })
+                        .eq('id', profileData.id);
+
+                    if (!updateError) {
+                        profileData.user_type = 'tourist';
+                        // Force refresh stats if needed by dispatching event, though hero section handles its own fetch
+                        window.dispatchEvent(new CustomEvent('profile-updated'));
+                    }
+                }
+
                 setProfile(profileData);
                 setName(profileData.display_name || "");
                 setPhone(profileData.phone || "");
@@ -198,7 +214,7 @@ const Profile = () => {
         setIsLoading(true);
 
         try {
-            
+
             const { data, error } = await supabase
                 .from('profiles')
                 .update({
@@ -209,7 +225,7 @@ const Profile = () => {
                 .eq('id', userId)
                 .select()
                 .maybeSingle();
-            
+
 
             if (error) {
                 throw error;
