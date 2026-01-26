@@ -59,7 +59,7 @@ const SponsorsSection = () => {
                     .from('partner_payments')
                     .select('id, company, area, logo_url, website_url, instagram_url, facebook_url, youtube_url')
                     .eq('plan_type', 'master')
-                    .in('payment_status', ['succeeded'])
+                    .in('payment_status', ['succeeded', 'active', 'paid'])
                     .limit(3);
 
                 if (error) throw error;
@@ -180,8 +180,8 @@ const SponsorsSection = () => {
                                 <div>
                                     <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-500 overflow-hidden">
                                         {'logoUrl' in sponsor && sponsor.logoUrl ? (
-                                            <img 
-                                                src={sponsor.logoUrl} 
+                                            <img
+                                                src={sponsor.logoUrl}
                                                 alt={sponsor.name}
                                                 className="w-full h-full object-cover"
                                             />

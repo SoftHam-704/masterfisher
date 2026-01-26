@@ -6,13 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { 
-    Table, 
-    TableBody, 
-    TableCell, 
-    TableHead, 
-    TableHeader, 
-    TableRow 
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow
 } from "@/components/ui/table";
 import {
     Dialog,
@@ -29,19 +29,23 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { 
-    CheckCircle, 
-    XCircle, 
-    Eye, 
-    Loader2, 
-    Trophy, 
+import {
+    CheckCircle,
+    XCircle,
+    Eye,
+    Loader2,
+    Trophy,
     Crown,
     ExternalLink,
     Instagram,
     Facebook,
     Youtube,
-    Globe
+    Globe,
+    Edit3,
+    Save
 } from "lucide-react";
+import { LogoUpload } from "@/components/LogoUpload";
+import { PhotoUpload } from "@/components/PhotoUpload";
 
 interface Partner {
     id: string;
@@ -54,6 +58,7 @@ interface Partner {
     amount: number;
     payment_status: string;
     logo_url: string | null;
+    photo_url: string | null;
     instagram_url: string | null;
     facebook_url: string | null;
     youtube_url: string | null;
@@ -68,6 +73,8 @@ export const AdminPartners = () => {
     const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editForm, setEditForm] = useState<Partial<Partner>>({});
     const [filterType, setFilterType] = useState<string>('all');
     const [filterStatus, setFilterStatus] = useState<string>('all');
 
@@ -120,6 +127,47 @@ export const AdminPartners = () => {
             toast({
                 title: "Erro",
                 description: "Não foi possível atualizar o status.",
+                variant: "destructive"
+            });
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
+    const handleSavePartner = async () => {
+        if (!selectedPartner) return;
+        setIsUpdating(true);
+        try {
+            const { error } = await supabase
+                .from('partner_payments')
+                .update({
+                    company: editForm.company,
+                    area: editForm.area,
+                    name: editForm.name,
+                    phone: editForm.phone,
+                    logo_url: editForm.logo_url,
+                    photo_url: editForm.photo_url,
+                    instagram_url: editForm.instagram_url,
+                    facebook_url: editForm.facebook_url,
+                    youtube_url: editForm.youtube_url,
+                    website_url: editForm.website_url,
+                })
+                .eq('id', selectedPartner.id);
+
+            if (error) throw error;
+
+            toast({
+                title: "Sucesso!",
+                description: "Dados do parceiro atualizados com sucesso."
+            });
+
+            setIsEditing(false);
+            fetchPartners();
+        } catch (error) {
+            console.error('Erro ao salvar parceiro:', error);
+            toast({
+                title: "Erro",
+                description: "Não foi possível salvar as alterações.",
                 variant: "destructive"
             });
         } finally {
@@ -259,9 +307,9 @@ export const AdminPartners = () => {
                                         <TableCell>
                                             <div className="flex items-center gap-3">
                                                 {partner.logo_url ? (
-                                                    <img 
-                                                        src={partner.logo_url} 
-                                                        alt={partner.company || ''} 
+                                                    <img
+                                                        src={partner.logo_url}
+                                                        alt={partner.company || ''}
                                                         className="w-10 h-10 rounded-lg object-cover"
                                                     />
                                                 ) : (
@@ -292,11 +340,13 @@ export const AdminPartners = () => {
                                                 size="sm"
                                                 onClick={() => {
                                                     setSelectedPartner(partner);
+                                                    setEditForm(partner);
+                                                    setIsEditing(false);
                                                     setIsModalOpen(true);
                                                 }}
                                             >
-                                                <Eye className="w-4 h-4 mr-1" />
-                                                Ver
+                                                <Edit3 className="w-4 h-4 mr-1" />
+                                                Gerenciar
                                             </Button>
                                         </TableCell>
                                     </TableRow>
@@ -322,18 +372,49 @@ export const AdminPartners = () => {
 
                     {selectedPartner && (
                         <div className="space-y-6">
+                            <div className="flex justify-end">
+                                <Button
+                                    variant={isEditing ? "destructive" : "outline"}
+                                    size="sm"
+                                    onClick={() => setIsEditing(!isEditing)}
+                                >
+                                    {isEditing ? "Cancelar Edição" : "Editar Informações"}
+                                </Button>
+                            </div>
+
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <Label className="text-muted-foreground">Empresa</Label>
-                                    <p className="font-medium">{selectedPartner.company || '-'}</p>
+                                    {isEditing ? (
+                                        <Input
+                                            value={editForm.company || ''}
+                                            onChange={(e) => setEditForm({ ...editForm, company: e.target.value })}
+                                        />
+                                    ) : (
+                                        <p className="font-medium">{selectedPartner.company || '-'}</p>
+                                    )}
                                 </div>
                                 <div>
                                     <Label className="text-muted-foreground">Área de Atuação</Label>
-                                    <p className="font-medium">{selectedPartner.area || '-'}</p>
+                                    {isEditing ? (
+                                        <Input
+                                            value={editForm.area || ''}
+                                            onChange={(e) => setEditForm({ ...editForm, area: e.target.value })}
+                                        />
+                                    ) : (
+                                        <p className="font-medium">{selectedPartner.area || '-'}</p>
+                                    )}
                                 </div>
                                 <div>
                                     <Label className="text-muted-foreground">Nome do Contato</Label>
-                                    <p className="font-medium">{selectedPartner.name}</p>
+                                    {isEditing ? (
+                                        <Input
+                                            value={editForm.name || ''}
+                                            onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                                        />
+                                    ) : (
+                                        <p className="font-medium">{selectedPartner.name}</p>
+                                    )}
                                 </div>
                                 <div>
                                     <Label className="text-muted-foreground">Email</Label>
@@ -341,104 +422,187 @@ export const AdminPartners = () => {
                                 </div>
                                 <div>
                                     <Label className="text-muted-foreground">Telefone</Label>
-                                    <p className="font-medium">{selectedPartner.phone || '-'}</p>
+                                    {isEditing ? (
+                                        <Input
+                                            value={editForm.phone || ''}
+                                            onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                                        />
+                                    ) : (
+                                        <p className="font-medium">{selectedPartner.phone || '-'}</p>
+                                    )}
                                 </div>
                                 <div>
                                     <Label className="text-muted-foreground">Valor</Label>
                                     <p className="font-medium">
-                                        {selectedPartner.amount > 0 
-                                            ? `R$ ${selectedPartner.amount.toFixed(2)}` 
+                                        {selectedPartner.amount > 0
+                                            ? `R$ ${selectedPartner.amount.toFixed(2)}`
                                             : 'Sob negociação'}
                                     </p>
                                 </div>
                             </div>
 
                             {/* Social Media Links */}
-                            <div>
-                                <Label className="text-muted-foreground mb-2 block">Redes Sociais</Label>
-                                <div className="flex gap-3">
-                                    {selectedPartner.instagram_url && (
-                                        <a href={selectedPartner.instagram_url} target="_blank" rel="noopener noreferrer">
-                                            <Button variant="outline" size="sm">
-                                                <Instagram className="w-4 h-4 mr-1" />
-                                                Instagram
-                                            </Button>
-                                        </a>
+                            <div className="space-y-4">
+                                <Label className="text-muted-foreground block">Redes Sociais</Label>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label className="text-xs">Instagram URL</Label>
+                                        {isEditing ? (
+                                            <Input
+                                                value={editForm.instagram_url || ''}
+                                                onChange={(e) => setEditForm({ ...editForm, instagram_url: e.target.value })}
+                                                placeholder="https://instagram.com/..."
+                                            />
+                                        ) : (
+                                            selectedPartner.instagram_url && (
+                                                <a href={selectedPartner.instagram_url} target="_blank" rel="noopener noreferrer" className="block text-sm text-blue-500 hover:underline">
+                                                    {selectedPartner.instagram_url}
+                                                </a>
+                                            )
+                                        )}
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-xs">Facebook URL</Label>
+                                        {isEditing ? (
+                                            <Input
+                                                value={editForm.facebook_url || ''}
+                                                onChange={(e) => setEditForm({ ...editForm, facebook_url: e.target.value })}
+                                                placeholder="https://facebook.com/..."
+                                            />
+                                        ) : (
+                                            selectedPartner.facebook_url && (
+                                                <a href={selectedPartner.facebook_url} target="_blank" rel="noopener noreferrer" className="block text-sm text-blue-500 hover:underline">
+                                                    {selectedPartner.facebook_url}
+                                                </a>
+                                            )
+                                        )}
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-xs">YouTube URL</Label>
+                                        {isEditing ? (
+                                            <Input
+                                                value={editForm.youtube_url || ''}
+                                                onChange={(e) => setEditForm({ ...editForm, youtube_url: e.target.value })}
+                                                placeholder="https://youtube.com/..."
+                                            />
+                                        ) : (
+                                            selectedPartner.youtube_url && (
+                                                <a href={selectedPartner.youtube_url} target="_blank" rel="noopener noreferrer" className="block text-sm text-blue-500 hover:underline">
+                                                    {selectedPartner.youtube_url}
+                                                </a>
+                                            )
+                                        )}
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-xs">Website URL</Label>
+                                        {isEditing ? (
+                                            <Input
+                                                value={editForm.website_url || ''}
+                                                onChange={(e) => setEditForm({ ...editForm, website_url: e.target.value })}
+                                                placeholder="https://..."
+                                            />
+                                        ) : (
+                                            selectedPartner.website_url && (
+                                                <a href={selectedPartner.website_url} target="_blank" rel="noopener noreferrer" className="block text-sm text-blue-500 hover:underline">
+                                                    {selectedPartner.website_url}
+                                                </a>
+                                            )
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Logo & Photo Upload */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t pt-6">
+                                <div className="space-y-4">
+                                    <Label className="text-muted-foreground block">Logotipo</Label>
+                                    {isEditing ? (
+                                        <LogoUpload
+                                            userId={selectedPartner.id}
+                                            userType="sponsor"
+                                            currentLogoUrl={editForm.logo_url || undefined}
+                                            onUploadComplete={(url) => setEditForm({ ...editForm, logo_url: url })}
+                                        />
+                                    ) : (
+                                        selectedPartner.logo_url ? (
+                                            <img
+                                                src={selectedPartner.logo_url}
+                                                alt="Logo"
+                                                className="w-32 h-32 object-contain rounded-lg border bg-slate-50 p-2"
+                                            />
+                                        ) : (
+                                            <p className="text-sm text-muted-foreground italic">Nenhum logo enviado</p>
+                                        )
                                     )}
-                                    {selectedPartner.facebook_url && (
-                                        <a href={selectedPartner.facebook_url} target="_blank" rel="noopener noreferrer">
-                                            <Button variant="outline" size="sm">
-                                                <Facebook className="w-4 h-4 mr-1" />
-                                                Facebook
-                                            </Button>
-                                        </a>
-                                    )}
-                                    {selectedPartner.youtube_url && (
-                                        <a href={selectedPartner.youtube_url} target="_blank" rel="noopener noreferrer">
-                                            <Button variant="outline" size="sm">
-                                                <Youtube className="w-4 h-4 mr-1" />
-                                                YouTube
-                                            </Button>
-                                        </a>
-                                    )}
-                                    {selectedPartner.website_url && (
-                                        <a href={selectedPartner.website_url} target="_blank" rel="noopener noreferrer">
-                                            <Button variant="outline" size="sm">
-                                                <Globe className="w-4 h-4 mr-1" />
-                                                Website
-                                            </Button>
-                                        </a>
-                                    )}
-                                    {!selectedPartner.instagram_url && !selectedPartner.facebook_url && 
-                                     !selectedPartner.youtube_url && !selectedPartner.website_url && (
-                                        <span className="text-muted-foreground text-sm">Nenhuma rede social informada</span>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <Label className="text-muted-foreground block">Foto de Perfil (Guia)</Label>
+                                    {isEditing ? (
+                                        <PhotoUpload
+                                            currentPhotoUrl={editForm.photo_url}
+                                            onUploadComplete={(url) => setEditForm({ ...editForm, photo_url: url })}
+                                            label="Foto do Guia"
+                                            description="Esta foto será exibida na seção de guias"
+                                        />
+                                    ) : (
+                                        selectedPartner.photo_url ? (
+                                            <img
+                                                src={selectedPartner.photo_url}
+                                                alt="Foto"
+                                                className="w-32 h-32 object-cover rounded-lg border"
+                                            />
+                                        ) : (
+                                            <p className="text-sm text-muted-foreground italic">Nenhuma foto enviada</p>
+                                        )
                                     )}
                                 </div>
                             </div>
 
-                            {/* Logo */}
-                            {selectedPartner.logo_url && (
-                                <div>
-                                    <Label className="text-muted-foreground mb-2 block">Logo</Label>
-                                    <img 
-                                        src={selectedPartner.logo_url} 
-                                        alt="Logo" 
-                                        className="w-32 h-32 object-cover rounded-lg border"
-                                    />
-                                </div>
-                            )}
-
-                            {/* Status Update */}
-                            <div className="border-t pt-4">
-                                <Label className="text-muted-foreground mb-2 block">Atualizar Status</Label>
-                                <div className="flex gap-2">
+                            {/* Actions */}
+                            <div className="border-t pt-4 space-y-4">
+                                {isEditing ? (
                                     <Button
-                                        variant="default"
-                                        size="sm"
-                                        disabled={isUpdating || selectedPartner.payment_status === 'active'}
-                                        onClick={() => updatePartnerStatus(selectedPartner.id, 'active')}
+                                        className="w-full"
+                                        disabled={isUpdating}
+                                        onClick={handleSavePartner}
                                     >
-                                        {isUpdating ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <CheckCircle className="w-4 h-4 mr-1" />}
-                                        Ativar
+                                        {isUpdating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
+                                        Salvar Alterações
                                     </Button>
-                                    <Button
-                                        variant="secondary"
-                                        size="sm"
-                                        disabled={isUpdating || selectedPartner.payment_status === 'approved'}
-                                        onClick={() => updatePartnerStatus(selectedPartner.id, 'approved')}
-                                    >
-                                        Aprovar
-                                    </Button>
-                                    <Button
-                                        variant="destructive"
-                                        size="sm"
-                                        disabled={isUpdating || selectedPartner.payment_status === 'rejected'}
-                                        onClick={() => updatePartnerStatus(selectedPartner.id, 'rejected')}
-                                    >
-                                        <XCircle className="w-4 h-4 mr-1" />
-                                        Rejeitar
-                                    </Button>
-                                </div>
+                                ) : (
+                                    <>
+                                        <Label className="text-muted-foreground mb-2 block">Atualizar Status</Label>
+                                        <div className="flex gap-2">
+                                            <Button
+                                                variant="default"
+                                                size="sm"
+                                                disabled={isUpdating || selectedPartner.payment_status === 'active' || selectedPartner.payment_status === 'succeeded'}
+                                                onClick={() => updatePartnerStatus(selectedPartner.id, 'active')}
+                                            >
+                                                {isUpdating ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <CheckCircle className="w-4 h-4 mr-1" />}
+                                                Ativar / Pago
+                                            </Button>
+                                            <Button
+                                                variant="secondary"
+                                                size="sm"
+                                                disabled={isUpdating || selectedPartner.payment_status === 'approved'}
+                                                onClick={() => updatePartnerStatus(selectedPartner.id, 'approved')}
+                                            >
+                                                Aprovar Negociação
+                                            </Button>
+                                            <Button
+                                                variant="destructive"
+                                                size="sm"
+                                                disabled={isUpdating || selectedPartner.payment_status === 'rejected'}
+                                                onClick={() => updatePartnerStatus(selectedPartner.id, 'rejected')}
+                                            >
+                                                <XCircle className="w-4 h-4 mr-1" />
+                                                Rejeitar
+                                            </Button>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </div>
                     )}
