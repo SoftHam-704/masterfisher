@@ -18,13 +18,13 @@ const fallbackSponsors = [
     { name: "OceanMaster", tagline: "Vista-se para Pescar", gradient: "from-amber-500 to-orange-600" },
 ];
 
-const sponsors = [
-    { name: "CastKing", category: "Iscas Artificiais" },
-    { name: "ReelTech", category: "Carretilhas" },
-    { name: "AquaLine", category: "Linhas Premium" },
-    { name: "TideForce", category: "Embarcações" },
-    { name: "NetWorks", category: "Acessórios" },
-    { name: "RiverPro", category: "Eletrônicos" },
+const fallbackSecondarySponsors = [
+    { name: "CastKing", category: "Iscas Artificiais", logoUrl: null as string | null },
+    { name: "ReelTech", category: "Carretilhas", logoUrl: null as string | null },
+    { name: "AquaLine", category: "Linhas Premium", logoUrl: null as string | null },
+    { name: "TideForce", category: "Embarcações", logoUrl: null as string | null },
+    { name: "NetWorks", category: "Acessórios", logoUrl: null as string | null },
+    { name: "RiverPro", category: "Eletrônicos", logoUrl: null as string | null },
 ];
 
 const partners = [
@@ -34,7 +34,8 @@ const partners = [
 
 interface MasterPartner {
     id: string;
-    company: string;
+    company: string | null;
+    name: string;
     area: string | null;
     logo_url: string | null;
     website_url: string | null;
@@ -43,35 +44,61 @@ interface MasterPartner {
     youtube_url: string | null;
 }
 
+interface MappedSponsor {
+    name: string;
+    tagline?: string;
+    category?: string;
+    gradient?: string;
+    logoUrl: string | null;
+    websiteUrl?: string | null;
+    instagramUrl?: string | null;
+    facebookUrl?: string | null;
+    youtubeUrl?: string | null;
+}
+
 const SponsorsSection = () => {
     const { t } = useLanguage();
     const navigate = useNavigate();
     const scrollRef = useRef<HTMLDivElement>(null);
     const [isPaused, setIsPaused] = useState(false);
     const [masterPartners, setMasterPartners] = useState<MasterPartner[]>([]);
+    const [goldPartners, setGoldPartners] = useState<MasterPartner[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Buscar parceiros Master do banco
+    // Buscar parceiros do banco
     useEffect(() => {
-        const fetchMasterPartners = async () => {
+        const fetchPartners = async () => {
             try {
-                const { data, error } = await supabase
+                // Fetch Master Partners
+                const { data: masterData, error: masterError } = await supabase
                     .from('partner_payments')
-                    .select('id, company, area, logo_url, website_url, instagram_url, facebook_url, youtube_url')
+                    .select('id, company, name, area, logo_url, website_url, instagram_url, facebook_url, youtube_url')
                     .eq('plan_type', 'master')
                     .in('payment_status', ['succeeded', 'active', 'paid'])
                     .limit(3);
 
-                if (error) throw error;
-                setMasterPartners(data || []);
+                if (masterError) throw masterError;
+                setMasterPartners(masterData || []);
+
+                // Fetch Gold Partners
+                const { data: goldData, error: goldError } = await supabase
+                    .from('partner_payments')
+                    .select('id, company, name, area, logo_url, website_url, instagram_url, facebook_url, youtube_url')
+                    .eq('plan_type', 'gold')
+                    .in('payment_status', ['succeeded', 'active', 'paid'])
+                    .limit(6);
+
+                if (goldError) throw goldError;
+                setGoldPartners(goldData || []);
+
             } catch (error) {
-                console.error('Erro ao buscar parceiros Master:', error);
+                console.error('Erro ao buscar parceiros:', error);
             } finally {
                 setIsLoading(false);
             }
         };
 
-        fetchMasterPartners();
+        fetchPartners();
     }, []);
 
     useEffect(() => {
@@ -97,9 +124,9 @@ const SponsorsSection = () => {
     }, [isPaused]);
 
     // Usar dados do banco se disponíveis, caso contrário usar fallback
-    const featuredSponsors = masterPartners.length > 0
+    const featuredSponsors: MappedSponsor[] = masterPartners.length > 0
         ? masterPartners.map((partner, index) => ({
-            name: partner.company,
+            name: partner.company || partner.name,
             tagline: partner.area || 'Parceiro Master',
             gradient: gradients[index % gradients.length],
             logoUrl: partner.logo_url,
@@ -108,7 +135,15 @@ const SponsorsSection = () => {
             facebookUrl: partner.facebook_url,
             youtubeUrl: partner.youtube_url,
         }))
-        : fallbackSponsors;
+        : fallbackSponsors.map(s => ({ ...s, logoUrl: null }));
+
+    const secondarySponsors: MappedSponsor[] = goldPartners.length > 0
+        ? goldPartners.map(partner => ({
+            name: partner.company || partner.name,
+            category: partner.area || 'Parceiro Gold',
+            logoUrl: partner.logo_url
+        }))
+        : fallbackSecondarySponsors;
 
     return (
         <section id="sponsors" className="relative py-20 overflow-hidden">
@@ -260,16 +295,24 @@ const SponsorsSection = () => {
 
                 {/* Secondary Sponsors Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-16">
-                    {sponsors.map((sponsor) => (
+                    {secondarySponsors.map((sponsor) => (
                         <div
                             key={sponsor.name}
                             className="group relative overflow-hidden rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 p-6 hover:bg-white/10 hover:border-white/20 transition-all duration-500 hover:-translate-y-1"
                         >
-                            {/* Logo placeholder */}
-                            <div className="w-14 h-14 mx-auto rounded-xl bg-gradient-to-br from-white/20 to-white/5 border border-white/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-500">
-                                <span className="text-xl font-display font-bold text-white">
-                                    {sponsor.name.charAt(0)}
-                                </span>
+                            {/* Logo placeholder or real logo */}
+                            <div className="w-14 h-14 mx-auto rounded-xl bg-gradient-to-br from-white/20 to-white/5 border border-white/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-500 overflow-hidden">
+                                {sponsor.logoUrl ? (
+                                    <img
+                                        src={sponsor.logoUrl}
+                                        alt={sponsor.name}
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <span className="text-xl font-display font-bold text-white">
+                                        {sponsor.name.charAt(0)}
+                                    </span>
+                                )}
                             </div>
 
                             <div className="text-center">

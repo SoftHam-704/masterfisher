@@ -1,13 +1,15 @@
-import { Star, MapPin, Fish, ChevronRight } from "lucide-react";
+import { Star, MapPin, Fish, ChevronRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import guideImage from "@/assets/guide-1.jpg";
 import pantanalImage from "@/assets/pantanal.jpg";
 
-const guides = [
+const fallbackGuides = [
     {
-        id: 1,
+        id: "1",
         name: "Carlos Silva",
         specialty: "Pesca de Tucunaré",
         location: "Amazônia, AM",
@@ -17,7 +19,7 @@ const guides = [
         price: "R$ 450/dia",
     },
     {
-        id: 2,
+        id: "2",
         name: "Roberto Mendes",
         specialty: "Pesca de Dourado",
         location: "Pantanal, MS",
@@ -27,7 +29,7 @@ const guides = [
         price: "R$ 380/dia",
     },
     {
-        id: 3,
+        id: "3",
         name: "João Ferreira",
         specialty: "Pesca Oceânica",
         location: "Florianópolis, SC",
@@ -41,7 +43,46 @@ const guides = [
 const GuidesSection = () => {
     const { t } = useLanguage();
     const navigate = useNavigate();
-    
+    const [guides, setGuides] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchGuides = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('partner_payments')
+                    .select('id, name, area, photo_url, phone')
+                    .eq('plan_type', 'guide')
+                    .in('payment_status', ['succeeded', 'active', 'paid', 'approved'])
+                    .limit(3);
+
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    const formattedGuides = data.map(g => ({
+                        id: g.id,
+                        name: g.name,
+                        specialty: g.area || "Guia de Pesca Profissional",
+                        location: "Brasil",
+                        rating: 5.0,
+                        reviews: 1,
+                        image: g.photo_url || guideImage,
+                        price: "Consulte",
+                    }));
+                    setGuides(formattedGuides);
+                } else {
+                    setGuides(fallbackGuides);
+                }
+            } catch (error) {
+                console.error('Erro ao buscar guias:', error);
+                setGuides(fallbackGuides);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchGuides();
+    }, []);
 
     return (
         <section id="guides" className="py-24 relative overflow-hidden">
@@ -78,65 +119,70 @@ const GuidesSection = () => {
                 </div>
 
                 {/* Guides Grid */}
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {guides.map((guide, index) => (
-                        <div
-                            key={guide.id}
-                            className="group relative bg-card rounded-2xl overflow-hidden shadow-ocean hover-lift"
-                            style={{ animationDelay: `${index * 150}ms` }}
-                        >
-                            {/* Image */}
-                            <div className="relative h-64 overflow-hidden">
-                                <img
-                                    src={guide.image}
-                                    alt={guide.name}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
+                {isLoading ? (
+                    <div className="flex justify-center py-20">
+                        <Loader2 className="w-10 h-10 animate-spin text-golden" />
+                    </div>
+                ) : (
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {guides.map((guide, index) => (
+                            <div
+                                key={guide.id}
+                                className="group relative bg-card rounded-2xl overflow-hidden shadow-ocean hover-lift"
+                                style={{ animationDelay: `${index * 150}ms` }}
+                            >
+                                {/* Image */}
+                                <div className="relative h-64 overflow-hidden">
+                                    <img
+                                        src={guide.image}
+                                        alt={guide.name}
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
 
-                                {/* Price Badge */}
-                                <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-golden text-foreground font-display font-semibold text-sm">
-                                    {guide.price}
+                                    {/* Price Badge */}
+                                    <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-golden text-foreground font-display font-semibold text-sm">
+                                        {guide.price}
+                                    </div>
+
+                                    {/* Rating */}
+                                    <div className="absolute bottom-4 left-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full glass-card">
+                                        <Star className="w-4 h-4 text-golden fill-golden" />
+                                        <span className="text-primary-foreground font-semibold text-sm">{guide.rating}</span>
+                                        <span className="text-primary-foreground/60 text-xs">({guide.reviews})</span>
+                                    </div>
                                 </div>
 
-                                {/* Rating */}
-                                <div className="absolute bottom-4 left-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full glass-card">
-                                    <Star className="w-4 h-4 text-golden fill-golden" />
-                                    <span className="text-primary-foreground font-semibold text-sm">{guide.rating}</span>
-                                    <span className="text-primary-foreground/60 text-xs">({guide.reviews})</span>
+                                {/* Content */}
+                                <div className="p-6">
+                                    <h3 className="font-display text-xl font-bold text-card-foreground mb-1 group-hover:text-primary transition-colors">
+                                        {guide.name}
+                                    </h3>
+                                    <div className="flex items-center gap-2 text-muted-foreground mb-3">
+                                        <Fish className="w-4 h-4 text-turquoise" />
+                                        <span className="font-body text-sm">{guide.specialty}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                        <MapPin className="w-4 h-4 text-golden" />
+                                        <span className="font-body text-sm">{guide.location}</span>
+                                    </div>
+
+                                    {/* CTA */}
+                                    <Button
+                                        onClick={() => navigate("/encontrar-servicos")}
+                                        variant="default"
+                                        className="w-full mt-6 bg-turquoise hover:bg-turquoise/90"
+                                    >
+                                        {t("guides.viewProfile")}
+                                    </Button>
                                 </div>
                             </div>
-
-                            {/* Content */}
-                            <div className="p-6">
-                                <h3 className="font-display text-xl font-bold text-card-foreground mb-1 group-hover:text-primary transition-colors">
-                                    {guide.name}
-                                </h3>
-                                <div className="flex items-center gap-2 text-muted-foreground mb-3">
-                                    <Fish className="w-4 h-4 text-turquoise" />
-                                    <span className="font-body text-sm">{guide.specialty}</span>
-                                </div>
-                                <div className="flex items-center gap-2 text-muted-foreground">
-                                    <MapPin className="w-4 h-4 text-golden" />
-                                    <span className="font-body text-sm">{guide.location}</span>
-                                </div>
-
-                                {/* CTA */}
-                                <Button
-                                    onClick={() => navigate("/encontrar-servicos")}
-                                    variant="default"
-                                    className="w-full mt-6 bg-turquoise hover:bg-turquoise/90"
-                                >
-                                    {t("guides.viewProfile")}
-                                </Button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </section>
     );
 };
 
 export default GuidesSection;
-
